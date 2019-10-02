@@ -1550,6 +1550,7 @@ func (w *Watcher) configureKubeWatch() (cache.Controller, chan struct{}) {
 						Version:       kubePod.GetLabels()["version"],
 						NodeName:      kubePod.Spec.NodeName,
 						Status:        kubePod.Status,
+						Spec:          kubePod.Spec,
 						IsTerminating: models.IsPodTerminating(kubePod),
 					}
 
