@@ -197,7 +197,7 @@ func replacePodsAndWait(
 
 	select {
 	case err = <-errChan:
-		logger.Error("operation terminated with error")
+		logger.WithError(err).Error("operation terminated with error")
 	case <-ctx.Done():
 		logger.Debug("operation timedout/canceled")
 	case <-finishedReplace:
@@ -305,6 +305,7 @@ func createNewRemoveOldPod(
 		[]*models.Pod{pod},
 	)
 
+	// TODO(lhahn): WTF is this?
 	if err != nil && !strings.Contains(err.Error(), "redis") {
 		return false, nil
 	}
@@ -494,7 +495,7 @@ func waitCreatingPods(
 	for range createdPods {
 		retryNo = append(retryNo, 0)
 	}
-	backoffStart := time.Duration(1 * time.Second)
+	backoffStart := 1 * time.Second
 
 	for {
 		exit := true
@@ -503,6 +504,7 @@ func waitCreatingPods(
 			for i, pod := range createdPods {
 				createdPod, err := models.GetPodFromRedis(redisClient, mr, pod.GetName(), namespace)
 				if err != nil {
+					// TODO(lhahn): if we failed to get the pod on redis, shouldn't we return an error here?
 					logger.
 						WithError(err).
 						WithField("pod", pod.GetName()).
@@ -518,7 +520,6 @@ func waitCreatingPods(
 
 					exit = false
 					logger.
-						WithError(err).
 						WithField("pod", pod.GetName()).
 						Errorf("error creating pod, recreating in %s (retry %d)", backoff, retryNo[i])
 
@@ -526,6 +527,7 @@ func waitCreatingPods(
 					err = mr.WithSegment(models.SegmentPod, func() error {
 						var err error
 						_, err = clientset.CoreV1().Pods(namespace).Create(&pod)
+						// TODO(lhahn): why is the backoff sleep here?
 						time.Sleep(backoff)
 						return err
 					})
@@ -703,7 +705,7 @@ func waitForPods(
 	for range pods {
 		retryNo = append(retryNo, 0)
 	}
-	backoffStart := time.Duration(500 * time.Millisecond)
+	backoffStart := 500 * time.Millisecond
 
 	for {
 		exit := true
@@ -756,7 +758,7 @@ func waitForPods(
 									"pending": isPending,
 									"reason":  reason,
 									"message": message,
-								}).Warn("pod is not running yet")
+								}).Info("pod is not running yet")
 								exit = false
 								break
 							}
@@ -1124,8 +1126,9 @@ func AcquireLock(
 	defer timeout.Stop()
 
 	l := logger.WithFields(logrus.Fields{
-		"source":    "AcquireLock",
-		"scheduler": schedulerName,
+		"source":        "AcquireLock",
+		"scheduler":     schedulerName,
+		"lockTimeoutMs": lockTimeoutMS,
 	})
 
 	for {
@@ -1138,8 +1141,8 @@ func AcquireLock(
 		)
 		select {
 		case <-timeout.C:
-			l.Warn("timeout while wating for redis lock")
-			return nil, false, errors.New("timeout while wating for redis lock")
+			l.Warn("timeout while waiting for redis lock")
+			return nil, false, errors.New("timeout while waiting for redis lock")
 		case <-ticker.C:
 			if operationManager != nil {
 				canceled, err := operationManager.WasCanceled()

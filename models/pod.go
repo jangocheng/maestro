@@ -404,6 +404,7 @@ func IsPodReady(pod *Pod) bool {
 		return false
 	}
 
+	// TODO(lhahn): is this correct? it only checks one conditions even though there is an array.
 	for _, condition := range status.Conditions {
 		if condition.Type == v1.PodReady {
 			return condition.Status == v1.ConditionTrue

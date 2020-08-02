@@ -665,7 +665,7 @@ func UpdateSchedulerConfig(
 		return nil
 	}
 
-	operationManager.SetDescription(models.OpManagerRunning)
+	_ = operationManager.SetDescription(models.OpManagerRunning)
 
 	scheduler, oldConfig, err := LoadScheduler(
 		mr,
@@ -751,7 +751,7 @@ func UpdateSchedulerConfig(
 		}
 
 		// delete invalidRooms key as EnsureCorrectRooms finished
-		models.RemoveInvalidRoomsKey(redisClient.Client, mr, schedulerName)
+		_ = models.RemoveInvalidRoomsKey(redisClient.Client, mr, schedulerName)
 
 		if err != nil {
 			l.WithError(err).Error("error during UpdateSchedulerConfig. Rolling back database")

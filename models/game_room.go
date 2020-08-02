@@ -95,7 +95,7 @@ func (g *GameRoomWithService) Create(
 	svc := NewService(pod.Name, configYAML)
 	_, err = svc.Create(clientset)
 	if err != nil {
-		deletePod(
+		_ = deletePod(
 			logger,
 			mr,
 			clientset,
