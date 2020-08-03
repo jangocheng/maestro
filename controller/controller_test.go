@@ -4227,7 +4227,7 @@ cmd:
 				opManager,
 			)
 			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(Equal("timeout while wating for redis lock"))
+			Expect(err.Error()).To(Equal("timeout while waiting for redis lock"))
 			config.Set("updateTimeoutSeconds", timeoutSec)
 		})
 
@@ -4264,7 +4264,7 @@ cmd:
 				opManager,
 			)
 			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(Equal("timeout while wating for redis lock"))
+			Expect(err.Error()).To(Equal("timeout while waiting for redis lock"))
 			config.Set("updateTimeoutSeconds", timeoutSec)
 		})
 
