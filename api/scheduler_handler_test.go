@@ -33,7 +33,7 @@ import (
 	"github.com/topfreegames/maestro/login"
 	"github.com/topfreegames/maestro/models"
 	"github.com/topfreegames/maestro/testing"
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 )
 
 var _ = Describe("Scheduler Handler", func() {
