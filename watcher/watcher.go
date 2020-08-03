@@ -673,19 +673,19 @@ func (w *Watcher) RemoveDeadRooms() error {
 	// get rooms with no ping
 	roomsNoPingSince, err := w.roomsWithNoPing(logger)
 	if err != nil {
-		return fmt.Errorf("failed to list rooms that are not pinging: %w", err)
+		return fmt.Errorf("failed to list rooms that are not pinging: %s", err)
 	}
 
 	// get rooms with occupation timeout
 	roomsOnOccupiedTimeout, err := w.roomsWithOccupationTimeout(logger)
 	if err != nil {
-		return fmt.Errorf("failed to list rooms that are on occupied timeout state: %w", err)
+		return fmt.Errorf("failed to list rooms that are on occupied timeout state: %s", err)
 	}
 
 	// get rooms registered
 	rooms, err := models.GetRooms(w.RedisClient.Client, w.SchedulerName, w.MetricsReporter)
 	if err != nil {
-		return fmt.Errorf("failed listing registered rooms: %w", err)
+		return fmt.Errorf("failed listing registered rooms: %s", err)
 	}
 
 	// append rooms with no ping and on occupation timeout
@@ -696,13 +696,13 @@ func (w *Watcher) RemoveDeadRooms() error {
 	if len(rooms) > 0 {
 		pods, err = w.listPods()
 		if err != nil {
-			return fmt.Errorf("failed to list pods on namespace: %w", err)
+			return fmt.Errorf("failed to list pods on namespace: %s", err)
 		}
 
 		// zombie rooms are the ones that are registered but the pods doesn't exist
 		roomsRemoved, err := w.removeZombies(pods, rooms)
 		if err != nil {
-			return fmt.Errorf("failed to remove zombie rooms: %w", err)
+			return fmt.Errorf("failed to remove zombie rooms: %s", err)
 		}
 
 		if len(roomsRemoved) > 0 {
@@ -717,7 +717,7 @@ func (w *Watcher) RemoveDeadRooms() error {
 		if len(pods) <= 0 {
 			pods, err = w.listPods()
 			if err != nil {
-				return fmt.Errorf("failed to list pods on namespace: %w", err)
+				return fmt.Errorf("failed to list pods on namespace: %s", err)
 			}
 		}
 		podsToDelete := w.filterPodsByName(logger, pods, append(roomsNoPingSince, roomsOnOccupiedTimeout...))
@@ -726,7 +726,7 @@ func (w *Watcher) RemoveDeadRooms() error {
 		scheduler := models.NewScheduler(w.SchedulerName, "", "")
 		err = scheduler.Load(w.DB)
 		if err != nil {
-			return fmt.Errorf("error accessing db while removing dead rooms: %w", err)
+			return fmt.Errorf("error accessing db while removing dead rooms: %s", err)
 		}
 
 		timeoutSec := w.Config.GetInt("updateTimeoutSeconds")
@@ -736,7 +736,7 @@ func (w *Watcher) RemoveDeadRooms() error {
 
 		configYAML, err := models.NewConfigYAML(scheduler.YAML)
 		if err != nil {
-			return fmt.Errorf("failed to unmarshal config yaml: %w", err)
+			return fmt.Errorf("failed to unmarshal config yaml: %s", err)
 		}
 
 		timedout, err := controller.DeletePodsAndWait(
@@ -755,7 +755,7 @@ func (w *Watcher) RemoveDeadRooms() error {
 		}
 
 		if err != nil {
-			return fmt.Errorf("replacing pods returned error on RemoveDeadRooms: %w", err)
+			return fmt.Errorf("replacing pods returned error on RemoveDeadRooms: %s", err)
 		}
 
 		if len(roomsNoPingSince) > 0 {
@@ -807,12 +807,12 @@ func (w *Watcher) AutoScale() error {
 			w.Run = false
 			return err
 		}
-		return fmt.Errorf("failed to get scheduler scaling info: %w", err)
+		return fmt.Errorf("failed to get scheduler scaling info: %s", err)
 	}
 
 	err = w.updateOccupiedTimeout(scheduler)
 	if err != nil {
-		return fmt.Errorf("failed to update scheduler occupied timeout: %w", err)
+		return fmt.Errorf("failed to update scheduler occupied timeout: %s", err)
 	}
 
 	l := logger.WithFields(logrus.Fields{
@@ -830,7 +830,7 @@ func (w *Watcher) AutoScale() error {
 		scheduler,
 	)
 	if err != nil {
-		return fmt.Errorf("failed to create namespace: %w", err)
+		return fmt.Errorf("failed to create namespace: %s", err)
 	}
 
 	nowTimestamp := time.Now().Unix()
@@ -842,7 +842,7 @@ func (w *Watcher) AutoScale() error {
 		nowTimestamp,
 	)
 	if err != nil {
-		return fmt.Errorf("failed to get scheduler occupancy info: %w", err)
+		return fmt.Errorf("failed to get scheduler occupancy info: %s", err)
 	}
 
 	if scaling.Delta > 0 {
@@ -910,7 +910,7 @@ func (w *Watcher) AutoScale() error {
 	if scaling.ChangedState {
 		err = controller.UpdateSchedulerState(logger, w.MetricsReporter, w.DB, scheduler)
 		if err != nil {
-			return fmt.Errorf("failed to update scheduler info: %w", err)
+			return fmt.Errorf("failed to update scheduler info: %s", err)
 		}
 	}
 	return nil
