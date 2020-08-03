@@ -969,7 +969,7 @@ var _ = Describe("Watcher", func() {
 				}, mockDb, nil, nil)
 
 				Expect(func() { w.AutoScale() }).ShouldNot(Panic())
-				Expect(hook.Entries).To(testing.ContainLogMessage("scheduler is subdimensioned, scaling up"))
+				Expect(hook.Entries).To(testing.ContainLogMessage("scheduler is sub-dimensioned, scaling up"))
 			})
 
 			It("should scale if roomCount is less than min", func() {
@@ -1109,7 +1109,7 @@ var _ = Describe("Watcher", func() {
 				}, mockDb, nil, nil)
 
 				Expect(func() { w.AutoScale() }).ShouldNot(Panic())
-				Expect(hook.Entries).To(testing.ContainLogMessage("scheduler is overdimensioned, should scale down"))
+				Expect(hook.Entries).To(testing.ContainLogMessage("scheduler is over-dimensioned, should scale down"))
 			})
 
 			It("should change state and not scale if in-sync but wrong state reported", func() {

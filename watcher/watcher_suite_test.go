@@ -9,24 +9,23 @@
 package watcher_test
 
 import (
+	"testing"
+
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/sirupsen/logrus"
 	"github.com/sirupsen/logrus/hooks/test"
 	"github.com/spf13/viper"
-	"github.com/topfreegames/extensions/redis"
-	"k8s.io/client-go/kubernetes/fake"
-	metricsFake "k8s.io/metrics/pkg/client/clientset/versioned/fake"
-
-	"testing"
-
 	pgmocks "github.com/topfreegames/extensions/pg/mocks"
+	"github.com/topfreegames/extensions/redis"
 	redismocks "github.com/topfreegames/extensions/redis/mocks"
 	eventforwardermock "github.com/topfreegames/maestro/eventforwarder/mock"
 	"github.com/topfreegames/maestro/mocks"
 	"github.com/topfreegames/maestro/models"
 	mtesting "github.com/topfreegames/maestro/testing"
+	"k8s.io/client-go/kubernetes/fake"
+	metricsFake "k8s.io/metrics/pkg/client/clientset/versioned/fake"
 )
 
 var (
